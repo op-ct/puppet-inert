@@ -1,0 +1,51 @@
+language: ruby
+rvm: ruby-2.1.9
+cache: bundler
+script:
+  - echo "============ this is a placeholder for real tests that pass"
+bundler_args: "--without system_tests"
+before_install:
+  - gem update bundler
+  - "[ \"${TRAVIS_TAG}x\" == 'x' ] && false || true"
+matrix:
+  fast_finish: true
+  include:
+  - rvm: 2.1.9
+    env: PUPPET_GEM_VERSION="~> 4.8.0"
+# --------------------------------------
+#
+# ## Releng process
+#
+# ### Sanity checks
+#
+#   - [X] the tag and the module version must match
+#
+# ### Deploy tasks
+#
+#   - [ ] Push to Puppet Forge
+#   - [ ] Create a Github release
+#
+# --------------------------------------
+before_deploy:
+  - "export PUPMOD_METADATA_VERSION=`ruby -r json -e \"puts JSON.parse(File.read('metadata.json')).fetch('version')\"`"
+  - 'export PUPMOD_METADATA_AND_TAG_AGREE=`test "${PUPMOD_METADATA_VERSION}x" == "${TRAVIS_TAG}x"`'
+  - 'test $TRAVIS_TAG =~ ^${PUPMOD_METADATA_VERSION}$'
+  - 'bundle exec rake metadata_lint'
+  - env
+  - false
+deploy:
+  provider: puppetforge
+  user: poxvupuli
+  password:
+    secure: f1CgLroKi0xTADz2wJt6uQXBs+SqANKXoTiyjFGH/xlAuG7TA3VAXvaRQODgQ7xB+87JbBJSBkq4A/yCV04e5xVOss5GQJRGya0X2YghJpnrS6WJ4SWQ/1zh/fxTFmYqNNvTZT38aTOTEYozt2KazNIbAIC6/4E5/tWk4B/XfgDiiurd4HiT9qnnghmxfLb1iGqvVdp+sbP9QWalWEvda01HyXDyVor7uHMYMC4O5nWxEHlwZ8UNXqGwH5tBLuShMNiOGatD+CNDI4Tjqw3hAb0/wQO1Np6oHp9e0uADnNyRTp6Rz1H53vyNamim7DTa13EL+IlIbfcyszMALRtAMON3zFnknwhLqpmCbK85GBfc/BI8R27vsicAGWCumeaOEXZ8X5pRYVbfwylzkfsiDDYg5jX5DZvWO34Yk5+/Az4OFP584OO/4G1ZNk0hTuCWgh7vL/WiHcxmed/7JK/E+gKpsyD/ky4mtK8g0F4u69C+d+06+Q+IkoUV5RvzYBigyagKBw1aXs0kStcYOCXxodKY4o6Pq8LdYFzraWXF4j50/qEbgFUftGnduhi2ljt/htAxcWHbBCeY21QsfIgCiXQt3SjcyU9opIrJkF4b0GTyNQ9oEt22q8PpNWlltdeLEphxvLo4hK1AvaBOadLnjAku7+piOfHFfzrl5guF+YY=
+  on:
+    tags: true
+    rvm: 2.1.9
+    all_branches: false
+    condition: '$FORGE_PUBLISH = true'
+after_deploy:
+  - echo "%%%%%%%%%%%%%%%%%%%%% after deploy"
+  - env
+  - true
+notifications:
+  email: false
