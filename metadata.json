@@ -1,0 +1,16 @@
+{
+  "name": "poxvupuli-inert",
+  "version": "0.2.0",
+  "author": "poxvupuli",
+  "summary": "Completely inert module that does nothing",
+  "license": "Apache-2.0",
+  "source": "https://github.com/poxvupuli/puppet-inert",
+  "project_page": null,
+  "issues_url": null,
+  "tags" : [ "inert" ],
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 4.0.0 < 5.0.0"}
+  ],
+  "data_provider": null
+}
+
